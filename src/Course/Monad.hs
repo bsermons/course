@@ -6,7 +6,7 @@
 module Course.Monad(
   Monad(..)
 , join
-, (>>=)  
+, (>>=)
 , (<=<)
 ) where
 
@@ -17,7 +17,7 @@ import Course.List
 import Course.Optional
 import qualified Prelude as P((=<<))
 
--- | All instances of the `Monad` type-class must satisfy one law. This law
+
 -- is not checked by the compiler. This law is given as:
 --
 -- * The law of associativity
@@ -67,8 +67,7 @@ infixr 1 =<<
   f (a -> b)
   -> f a
   -> f b
-(<*>) =
-  error "todo: Course.Monad#(<*>)"
+(<*>) f a = (\e -> return . e =<< a) =<< f
 
 infixl 4 <*>
 
@@ -81,8 +80,7 @@ instance Monad Id where
     (a -> Id b)
     -> Id a
     -> Id b
-  (=<<) =
-    error "todo: Course.Monad (=<<)#instance Id"
+  (=<<) f (Id a) = f a
 
 -- | Binds a function on a List.
 --
