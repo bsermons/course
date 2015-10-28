@@ -62,7 +62,11 @@ the contents of c
 main ::
   IO ()
 main =
-  error "todo: Course.FileIO#main"
+  getArgs
+  >>= (\args ->
+         case args of
+           x :. Nil -> run x
+           _ -> putStrLn "Invalid arguments")
 
 type FilePath =
   Chars
@@ -71,31 +75,29 @@ type FilePath =
 run ::
   Chars
   -> IO ()
-run =
-  error "todo: Course.FileIO#run"
+run file =
+  getFile file
+  >>= getFiles . lines . snd
+  >>= printFiles
 
 getFiles ::
   List FilePath
   -> IO (List (FilePath, Chars))
-getFiles =
-  error "todo: Course.FileIO#getFiles"
+getFiles files = sequence $ getFile <$> files
 
 getFile ::
   FilePath
   -> IO (FilePath, Chars)
-getFile =
-  error "todo: Course.FileIO#getFile"
+getFile fp = readFile fp >>= (\chars -> return (fp, chars))
 
 printFiles ::
   List (FilePath, Chars)
   -> IO ()
-printFiles =
-  error "todo: Course.FileIO#printFiles"
+printFiles fdata = sequence ((\fargs -> (uncurry printFile fargs) ) `map` fdata) >> return ()
 
 printFile ::
   FilePath
   -> Chars
   -> IO ()
-printFile =
-  error "todo: Course.FileIO#printFile"
+printFile _ = putStrLn
 
