@@ -39,8 +39,8 @@ instance Functor (State s) where
     (a -> b)
     -> State s a
     -> State s b
-  (<$>) f (State k) = State (\s -> let (a, s') = k s
-                                   in (f a, s'))
+  (<$>) f (State k) = State (\s -> let (a, t) = k s
+                             in (f a, t))
 
 -- | Implement the `Applicative` instance for `State s`.
 --
@@ -85,7 +85,7 @@ exec ::
   State s a
   -> s
   -> s
-exec sa s = snd $ runState sa s
+exec sa = snd . runState sa
 
 -- | Run the `State` seeded with `s` and retrieve the resulting value.
 --
@@ -94,7 +94,7 @@ eval ::
   State s a
   -> s
   -> a
-eval sa s = fst $ runState sa s
+eval sa = fst . runState sa
 
 -- | A `State` where the state also distributes into the produced value.
 --
@@ -102,7 +102,7 @@ eval sa s = fst $ runState sa s
 -- (0,0)
 get ::
   State s s
-get = State (\s -> (s,s))
+get = State (\s -> (s, s))
 
 -- | A `State` where the resulting state is seeded with the given value.
 --
@@ -128,17 +128,17 @@ put s = State (\_ -> ((), s))
 -- >>> let p x = (\s -> (const $ pure (x == 'i')) =<< put (1+s)) =<< get in runState (findM p $ listh ['a'..'h']) 0
 -- (Empty,8)
 findM ::
-  Monad f =>
-  (a -> f Bool)
+  Monad m =>
+  (a -> m Bool)
   -> List a
-  -> f (Optional a)
+  -> m (Optional a)
 findM _ Nil = pure Empty
 findM f (x :. xs) =
-  isMatch =<< f x
-  where isMatch a =
-          if a then return $ Full x
+  getMatch =<< f x
+  where getMatch r =
+          if r == True
+          then return (Full x)
           else findM f xs
-
 
 -- | Find the first element in a `List` that repeats.
 -- It is possible that no element repeats, hence an `Optional` result.

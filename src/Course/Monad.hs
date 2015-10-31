@@ -83,6 +83,7 @@ instance Monad Id where
   (=<<) f (Id a) = f a
 
 -- | Binds a function on a List.
+--(\e -> return . e =<< a) =<< f
 --
 -- >>> (\n -> n :. n :. Nil) =<< (1 :. 2 :. 3 :. Nil)
 -- [1,1,2,2,3,3]
@@ -102,7 +103,8 @@ instance Monad Optional where
     (a -> Optional b)
     -> Optional a
     -> Optional b
-  (=<<) = bindOptional
+  (=<<) _ Empty = Empty
+  (=<<) f (Full a) = f a
 
 -- | Binds a function on the reader ((->) t).
 --
@@ -132,7 +134,7 @@ join ::
   Monad f =>
   f (f a)
   -> f a
-join fa = id =<< fa
+join ffa = id =<< ffa
 
 -- | Implement a flipped version of @(=<<)@, however, use only
 -- @join@ and @(<$>)@.
@@ -145,8 +147,7 @@ join fa = id =<< fa
   f a
   -> (a -> f b)
   -> f b
-(>>=) =
-  flip (=<<)
+(>>=) = flip (=<<)
 
 infixl 1 >>=
 
