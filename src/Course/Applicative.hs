@@ -144,14 +144,14 @@ instance Applicative Optional where
 instance Applicative ((->) t) where
   pure ::
     a
-    -> ((->) t a)
+    -> (->) t a
   pure a _ = a
   (<*>) ::
-    ((->) t (a -> b))
-    -> ((->) t a)
-    -> ((->) t b)
+    (->) t (a -> b)
+    -> (->) t a
+    -> (->) t b
   --(t -> (a -> b)) (<*>) (t -> a) = (t -> b)
-  x <*> y = (\t -> (x t) (y t))
+  x <*> y = \t -> (x t) (y t)
 
 
 
